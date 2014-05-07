@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<project name="Ant Test" default="run" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<property name="dir.src" location="src/main/java" />
+	<property name="dir.test.src" location="src/test/java" />
+	<property name="dir.build" location="build" />
+	<property name="dir.classes" location="${dir.build}/classes" />
+	<property name="dir.test.classes" location="${dir.build}/test-classes" />
+	<property name="dir.test.reports" location="${dir.build}/test-reports" />
+	<property name="dir.ivy.reports" location="${dir.build}/ivy-reports" />
+
+	<target name="init">
+		<ivy:resolve />
+
+		<ivy:report todir="${dir.ivy.reports}" graph="false" xml="false" />
+
+		<ivy:cachepath pathid="compile.path" conf="compile" />
+		<ivy:cachepath pathid="runtime.path" conf="runtime" />
+		<ivy:cachepath pathid="test.path" conf="test" />
+
+		<mkdir dir="${dir.classes}" />
+		<mkdir dir="${dir.test.classes}" />
+		<mkdir dir="${dir.test.reports}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="${dir.src}" destdir="${dir.classes}" includeantruntime="false" debug="true" classpathref="compile.path" />
+	</target>
+
+	<target name="compile-tests" depends="compile">
+		<javac srcdir="${dir.test.src}" destdir="${dir.test.classes}" includeantruntime="false" debug="true">
+			<classpath>
+				<path refid="test.path" />
+				<pathelement path="${dir.classes}" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="test" depends="compile-tests">
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath>
+				<path refid="test.path" />
+				<pathelement path="${dir.classes}" />
+				<pathelement path="${dir.test.classes}" />
+			</classpath>
+
+			<formatter type="plain" usefile="false" />
+
+			<batchtest fork="yes" todir="${dir.test.reports}">
+				<fileset dir="${dir.test.src}">
+						<include name="**/*Test*.java" />
+						<include name="**/AllTests.java" />
+				</fileset>
+			</batchtest>
+
+		</junit>
+	</target>
+
+	<target name="build" depends="test" />
+
+	<target name="run" depends="build"> 
+		<java classname="org.demo.App">
+			<classpath>
+				<path refid="runtime.path" />
+				<pathelement location="${dir.classes}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="clean">
+		<delete dir="${dir.build}" />
+	</target>
+
+	<target name="clean-all" depends="clean">
+		<ivy:cleancache />
+	</target>
+</project>

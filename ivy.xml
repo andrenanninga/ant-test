@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ivy-module version="2.0">
+	<info organisation="com.am" module="demo" />
+
+	<configurations defaultconfmapping="compile->default">
+		<conf name="compile" />
+		<conf name="runtime" />
+		<conf name="test" />
+	</configurations>
+
+	<dependencies>
+		<dependency org="junit" name="junit" rev="4.10" conf="test->default" />
+	</dependencies>
+
+</ivy-module>
